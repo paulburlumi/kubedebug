@@ -1,0 +1,9 @@
+{
+    "id": "local",
+    "version": "1.0.0",
+    "name": "Local config",
+    "description": "Sets up the local developer configuration.",
+    "installsAfter": [
+		"ghcr.io/devcontainers/features/docker-outside-of-docker"
+    ]
+}
