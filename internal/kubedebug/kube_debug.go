@@ -261,6 +261,7 @@ func (kd *KubeDebug) debugContainer() error {
 		"-it",
 		"--target="+kd.containerName,
 		"--image="+kd.imageName,
+		"--profile=sysadmin",
 	)
 	if err != nil {
 		return fmt.Errorf("could not run: %w", err)
