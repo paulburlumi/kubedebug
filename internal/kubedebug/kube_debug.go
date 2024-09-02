@@ -207,7 +207,7 @@ func (kd *KubeDebug) chooseContainer() error {
 		return fmt.Errorf("could not output: %w", err)
 	}
 
-	containerNames := strings.Split(strings.TrimSpace(out), "\n")
+	containerNames := strings.Split(strings.TrimSpace(out), " ")
 
 	if len(containerNames) == 0 {
 		return errors.New("no kubernetes containers found")
