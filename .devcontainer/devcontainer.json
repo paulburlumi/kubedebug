@@ -1,6 +1,6 @@
 {
 	"name": "kubedebug",
-	"image": "mcr.microsoft.com/devcontainers/go:1.22-bookworm",
+	"image": "mcr.microsoft.com/devcontainers/go:1.23-bookworm",
 	// Set *default* container specific settings.json values on container create.
 	"customizations": {
 		"vscode": {
