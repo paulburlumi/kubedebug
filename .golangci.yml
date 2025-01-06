@@ -6,10 +6,6 @@ output:
   # Default: true
   print-issued-lines: false
 
-  # Make issues output unique by line.
-  # Default: true
-  uniq-by-line: false
-
   # Sort results by: filepath, line and column.
   sort-results: true
 
@@ -200,6 +196,10 @@ issues:
   # Set to 0 to disable.
   # Default: 3
   max-same-issues: 0
+
+  # Make issues output unique by line.
+  # Default: true
+  uniq-by-line: false
 
   # Show only new issues created after git revision `REV`.
   # new-from-rev: 45ee2c66b105ad6228574caf7d9a97187d881f03
