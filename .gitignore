@@ -23,3 +23,4 @@ go.work.sum
 
 cover.out
 test-results/
+bin/

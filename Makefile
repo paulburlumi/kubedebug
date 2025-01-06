@@ -3,9 +3,9 @@
 lint:
 	$(VERBOSE) go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4 run
 
-.PHONY: install
-install:
-	CGO_ENABLED=0 go install -v -ldflags "-s -w" ./...
+.PHONY: build
+build:
+	CGO_ENABLED=0 go build -v -ldflags "-s -w" -o bin/ ./...
 
 .PHONY: test
 test:
