@@ -1,7 +1,7 @@
 
 .PHONY: lint
 lint:
-	$(VERBOSE) go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4 run
+	$(VERBOSE) golangci-lint run
 
 .PHONY: build
 build:

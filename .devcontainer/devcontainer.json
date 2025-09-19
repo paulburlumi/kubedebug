@@ -1,15 +1,15 @@
 {
 	"name": "kubedebug",
-	"image": "mcr.microsoft.com/devcontainers/go:1.23-bookworm",
+	"image": "mcr.microsoft.com/devcontainers/go:1.25-bookworm",
 	// Set *default* container specific settings.json values on container create.
 	"customizations": {
 		"vscode": {
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "bash",
 				// https://github.com/golang/vscode-go/wiki/settings
-				"go.lintTool": "golangci-lint",
+				"go.lintTool": "golangci-lint-v2",
 				"go.lintFlags": [
-					"--fast"
+					// "--fast-only" // TODO(pgb) - not working.. determine why and re-enable
 				]
 			},
 			// Add the IDs of extensions you want installed when the container is created.
