@@ -2,6 +2,7 @@
 package kubedebug
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -14,8 +15,8 @@ import (
 
 // Commander executes commands
 type Commander interface {
-	Output(name string, arg ...string) (string, error)
-	Run(redirect bool, name string, arg ...string) error
+	Output(ctx context.Context, name string, arg ...string) (string, error)
+	Run(ctx context.Context, redirect bool, name string, arg ...string) error
 }
 
 // KubeDebug interactively runs "kubectl debug"
@@ -23,7 +24,7 @@ type KubeDebug struct {
 	args          []string
 	stderr        io.Writer
 	command       Commander
-	actions       []func() error
+	actions       []func(context.Context) error
 	contextName   string
 	namespaceName string
 	podName       string
@@ -38,7 +39,7 @@ func NewKubeDebug(args []string, stderr io.Writer, command Commander) *KubeDebug
 		stderr:  stderr,
 		command: command,
 	}
-	kd.actions = []func() error{
+	kd.actions = []func(ctx context.Context) error{
 		kd.parseArgs,
 		kd.chooseContext,
 		kd.setContext,
@@ -52,16 +53,16 @@ func NewKubeDebug(args []string, stderr io.Writer, command Commander) *KubeDebug
 }
 
 // Run the interactive actions
-func (kd *KubeDebug) Run() error {
+func (kd *KubeDebug) Run(ctx context.Context) error {
 	for _, action := range kd.actions {
-		if err := action(); err != nil {
+		if err := action(ctx); err != nil {
 			return fmt.Errorf("could not run action: %w", err)
 		}
 	}
 	return nil
 }
 
-func (kd *KubeDebug) parseArgs() error {
+func (kd *KubeDebug) parseArgs(_ context.Context) error {
 	name := filepath.Base(kd.args[0])
 	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
 	flagSet.SetOutput(kd.stderr)
@@ -77,8 +78,9 @@ func (kd *KubeDebug) parseArgs() error {
 	return nil
 }
 
-func (kd *KubeDebug) chooseContext() error {
+func (kd *KubeDebug) chooseContext(ctx context.Context) error {
 	out, err := kd.command.Output(
+		ctx,
 		"kubectl",
 		"config",
 		"get-contexts",
@@ -105,14 +107,15 @@ func (kd *KubeDebug) chooseContext() error {
 				Value(&kd.contextName),
 		),
 	)
-	if err := form.Run(); err != nil {
+	if err := form.RunWithContext(ctx); err != nil {
 		return fmt.Errorf("could not run form: %w", err)
 	}
 	return nil
 }
 
-func (kd *KubeDebug) setContext() error {
+func (kd *KubeDebug) setContext(ctx context.Context) error {
 	err := kd.command.Run(
+		ctx,
 		false,
 		"kubectl",
 		"config",
@@ -125,8 +128,9 @@ func (kd *KubeDebug) setContext() error {
 	return nil
 }
 
-func (kd *KubeDebug) chooseNamespace() error {
+func (kd *KubeDebug) chooseNamespace(ctx context.Context) error {
 	out, err := kd.command.Output(
+		ctx,
 		"kubectl",
 		"get",
 		"ns",
@@ -153,14 +157,15 @@ func (kd *KubeDebug) chooseNamespace() error {
 				Value(&kd.namespaceName),
 		),
 	)
-	if err := form.Run(); err != nil {
+	if err := form.RunWithContext(ctx); err != nil {
 		return fmt.Errorf("could not run form: %w", err)
 	}
 	return nil
 }
 
-func (kd *KubeDebug) choosePod() error {
+func (kd *KubeDebug) choosePod(ctx context.Context) error {
 	out, err := kd.command.Output(
+		ctx,
 		"kubectl",
 		"-n", kd.namespaceName,
 		"get",
@@ -188,14 +193,15 @@ func (kd *KubeDebug) choosePod() error {
 				Value(&kd.podName),
 		),
 	)
-	if err := form.Run(); err != nil {
+	if err := form.RunWithContext(ctx); err != nil {
 		return fmt.Errorf("could not run form: %w", err)
 	}
 	return nil
 }
 
-func (kd *KubeDebug) chooseContainer() error {
+func (kd *KubeDebug) chooseContainer(ctx context.Context) error {
 	out, err := kd.command.Output(
+		ctx,
 		"kubectl",
 		"-n", kd.namespaceName,
 		"get",
@@ -224,13 +230,13 @@ func (kd *KubeDebug) chooseContainer() error {
 				Value(&kd.containerName),
 		),
 	)
-	if err := form.Run(); err != nil {
+	if err := form.RunWithContext(ctx); err != nil {
 		return fmt.Errorf("could not run form: %w", err)
 	}
 	return nil
 }
 
-func (kd *KubeDebug) chooseImage() error {
+func (kd *KubeDebug) chooseImage(ctx context.Context) error {
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
@@ -245,14 +251,15 @@ func (kd *KubeDebug) chooseImage() error {
 				Value(&kd.imageName),
 		),
 	)
-	if err := form.Run(); err != nil {
+	if err := form.RunWithContext(ctx); err != nil {
 		return fmt.Errorf("could not run form: %w", err)
 	}
 	return nil
 }
 
-func (kd *KubeDebug) debugContainer() error {
+func (kd *KubeDebug) debugContainer(ctx context.Context) error {
 	err := kd.command.Run(
+		ctx,
 		true,
 		"kubectl",
 		"-n", kd.namespaceName,

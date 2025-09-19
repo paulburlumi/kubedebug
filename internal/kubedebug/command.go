@@ -24,8 +24,8 @@ func NewCommand(stdin io.Reader, stdout, stderr io.Writer) *Command {
 }
 
 // Output runs the command and returns its standard output.
-func (c *Command) Output(name string, arg ...string) (string, error) {
-	cmd := exec.CommandContext(context.Background(), name, arg...)
+func (c *Command) Output(ctx context.Context, name string, arg ...string) (string, error) {
+	cmd := exec.CommandContext(ctx, name, arg...)
 	out, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("%v failed: %w", cmd.Args, err)
@@ -34,8 +34,8 @@ func (c *Command) Output(name string, arg ...string) (string, error) {
 }
 
 // Run starts the specified command and waits for it to complete.
-func (c *Command) Run(redirect bool, name string, arg ...string) error {
-	cmd := exec.CommandContext(context.Background(), name, arg...)
+func (c *Command) Run(ctx context.Context, redirect bool, name string, arg ...string) error {
+	cmd := exec.CommandContext(ctx, name, arg...)
 	if redirect {
 		cmd.Stdin = c.stdin
 		cmd.Stdout = c.stdout
